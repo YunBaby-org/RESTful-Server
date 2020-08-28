@@ -15,12 +15,12 @@ def login_handler():
         tokenPayload = {
             'userid': user.id, 
             'username': user.username, 
-            'exp':datetime.datetime.utcnow()+datetime.timedelta(hours=1)
+            'exp':datetime.datetime.utcnow()+datetime.timedelta(days=1)
         }
         token = jwt.encode(payload=tokenPayload, key=JWT_SECRET_KEY)
         resp = make_response(jsonify({'message': 'Login Successful'}), 200)
         # 傳送 設定 cookies time
-        resp.set_cookie(key='JWT_TOKEN', value=token, expires=datetime.datetime.utcnow()+datetime.timedelta(hours=1))
+        resp.set_cookie(key='JWT_TOKEN', value=token, expires=datetime.datetime.utcnow()+datetime.timedelta(days=1))
         return resp
     else:
         return jsonify({'message': 'Username or Password Error!'}), 403
