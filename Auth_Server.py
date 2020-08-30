@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, g
 import config
 from flask_sqlalchemy import SQLAlchemy
 from src.module import db

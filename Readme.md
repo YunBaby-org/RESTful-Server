@@ -1,16 +1,19 @@
-# RESTful Server
+# Server
 # Run
-## RESTful_server
-IP：127.0.0.1
-Port：5001
-```
-$ python RESTful_server.py
-```
 ## Auth_Server
 IP：127.0.0.1
+
 Port：5000
 ```
 $ python Auth_Server.py
+```
+
+## RESTful_server
+IP：127.0.0.1
+
+Port：5001
+```
+$ python RESTful_Server.py
 ```
 
 

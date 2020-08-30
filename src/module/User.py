@@ -1,5 +1,5 @@
 from . import db
-from ..utils import utils
+import src.utils.utils as utils
 
 class User(db.Model):
     """
