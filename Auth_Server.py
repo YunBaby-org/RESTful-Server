@@ -1,8 +1,10 @@
 from flask import Flask, request, g
 import config
 from flask_sqlalchemy import SQLAlchemy
-from src.module import db
+from src.api.resources import db
 from src.auth.auth import login_handler, signup_handler, token_require, logout_handler
+# from td import createe, addd
+# import src.utils.utils as utils
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -29,5 +31,11 @@ def signup():
         return signup_handler()
     
 
+@app.route('/')
+def index():
+    # createe(db)
+    # addd(db)
+    return 'utils.getqqq()'
+
 if __name__=='__main__':
-    app.run(port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

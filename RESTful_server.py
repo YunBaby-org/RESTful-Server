@@ -1,12 +1,10 @@
 from flask import Flask, jsonify, request, make_response
 import config
 from flask_sqlalchemy import SQLAlchemy
-from src.module.User import User
-from src.module import db
+from src.api.resources.users import User
+from src.api.resources import db
 from src.auth.auth import token_require
-from src.auth import JWT_SECRET_KEY
-from src.api.send_request import BrowserToRabbit
-from src.api.location import getLocInfo
+from src.api.action import BrowserToRabbit
 
 
 app = Flask(__name__)
@@ -26,7 +24,7 @@ def usersInfo():
     # 更新 user 資訊
     elif request.method=='PUT':
         # 接收格式為 JSON
-        data = User.updateUserInfo(username=request.json.get('username') , email=request.json.get('email'), phone=request.json.get('phone'))
+        data = User.updateUserInfo()
         return jsonify({'message': data})
 
 # location
@@ -34,8 +32,7 @@ def usersInfo():
 @token_require
 def location():
     if request.method=='GET':
-        getLocInfo()
-        return 'LOC'
+        return User.getLocInfo()
 
 # send-request
 @app.route('/api/v1/action/send-request', methods=['POST'])
@@ -55,6 +52,24 @@ def boundary():
 def responses():
     pass
 
+# trackers
+@app.route('/api/v1/resources/users/trackers', methods=['GET'])
+@token_require
+def trackers():
+    return User.getTrackers()
+
+
+# addtracker
+@app.route('/api/v1/resources/users/addtracker', methods=['PUT'])
+@token_require
+def addtracker():
+    return User.addTrackers()
+
+# deltracker
+@app.route('/api/v1/resources/users/deltracker', methods=['PUT'])
+@token_require
+def deltracker():
+    return User.delTrackers()
 
 if __name__=='__main__':
-    app.run(port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

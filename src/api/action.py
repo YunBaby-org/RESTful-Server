@@ -9,6 +9,7 @@ request_dict = {
 # 之後要使用 Pika 套件 -> RabbitMQ
 def BrowserToRabbit():
     """
+    send_request
     接收 browser 的要求，之後送給 rabbit
     """
     request_data = request.json.get('Request')

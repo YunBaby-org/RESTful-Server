@@ -1,10 +1,11 @@
-from . import db, JWT_SECRET_KEY
 from flask import request, make_response, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt, datetime
 from functools import wraps
-import src.module.User as User
+import src.api.resources.users as User
 import src.utils.utils as utils
+from src.api.resources import db
+from .. import JWT_SECRET_KEY
 
 def login_handler():
     """

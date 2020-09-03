@@ -1,7 +1,7 @@
 from flask import request
 import jwt, datetime
 from .. import JWT_SECRET_KEY
-import src.module.User as User
+import src.api.resources.users as User
 
 def getTokenData():
     """
@@ -20,3 +20,18 @@ def referToken():
         'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
     }
     return jwt.encode(payload=tokenPayload, key=JWT_SECRET_KEY)
+
+
+def getTkrData(tkr):
+    return {
+        'trackerid': tkr.id,
+        'name': tkr.tkrname,
+        'phone': tkr.phone 
+    }
+
+# def getqqq():
+#     return {
+#         'trackerid': 'trackerid',
+#         'name': 'trackerid',
+#         'phone': 'trackerid'
+#     }
