@@ -1,5 +1,5 @@
 # Server
-# Run
+# Run 一個
 ## Auth_Server
 IP：0.0.0.0
 
@@ -16,10 +16,28 @@ Port：5001
 $ python RESTful_Server.py
 ```
 
-### In Multi
+# Run 多個
+## Auth_Server
+```
+gunicorn -c gun_a.py Auth_Server:app
 ```
 
+## RESTful_server
 ```
+gunicorn -c gun_r.py RESTful_Server:app
+```
+
+# PostgreSQL
+user：```postgres```
+
+password：```123456```
+
+host：```127.0.0.1```
+
+port：```5432```
+
+
+
 
 # Work
 JWT 驗證(登路、登出、註冊)

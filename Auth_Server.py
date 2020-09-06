@@ -1,15 +1,9 @@
-from flask import Flask, request, g
-import config
-from flask_sqlalchemy import SQLAlchemy
-from src.api.resources import db
+from flask import Flask, request
 from src.auth.auth import login_handler, signup_handler, token_require, logout_handler
-# from td import createe, addd
-# import src.utils.utils as utils
+from src import SECRET_KEY
 
 app = Flask(__name__)
-app.config.from_object(config)
-# 實例化的數據庫
-db.init_app(app)
+app.config['SECRET_KEY'] = SECRET_KEY
 
 # 登陸
 @app.route('/login', methods=['POST'])
@@ -35,7 +29,8 @@ def signup():
 def index():
     # createe(db)
     # addd(db)
-    return 'utils.getqqq()'
+    return 'Hi'
 
 if __name__=='__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+    # app.run(port=5000, debug=True)

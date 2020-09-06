@@ -1,16 +1,12 @@
 from flask import Flask, jsonify, request, make_response
-import config
-from flask_sqlalchemy import SQLAlchemy
-from src.api.resources.users import User
-from src.api.resources import db
+import src.api.resources.users as User
 from src.auth.auth import token_require
 from src.api.action import BrowserToRabbit
-
+from src import SECRET_KEY
 
 app = Flask(__name__)
-app.config.from_object(config)
-# 實例化的數據庫
-db.init_app(app)
+# app.config.from_object(config)
+app.config['SECRET_KEY'] = SECRET_KEY
 
     
 # information
@@ -24,8 +20,7 @@ def usersInfo():
     # 更新 user 資訊
     elif request.method=='PUT':
         # 接收格式為 JSON
-        data = User.updateUserInfo()
-        return jsonify({'message': data})
+        return User.updateUserInfo()
 
 # location
 @app.route('/api/v1/resources/users/location', methods=['GET'])
@@ -41,10 +36,13 @@ def send_request():
     return BrowserToRabbit()
 
 # boundary
-@app.route('/api/v1/resources/users/boundary', methods=['POST'])
+@app.route('/api/v1/resources/users/boundary', methods=['GET', 'PUT'])
 @token_require
 def boundary():
-    pass
+    if request.method=='GET':
+        return User.getBoundary()
+    elif request.method=='PUT':
+        pass
 
 # responses
 @app.route('/api/v1/resources/users/responses', methods=['GET'])
@@ -73,3 +71,4 @@ def deltracker():
 
 if __name__=='__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
+    # app.run(port=5001, debug=True)
