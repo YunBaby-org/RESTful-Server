@@ -1,0 +1,9 @@
+# folder
+__pycache__
+
+
+# db table
+db_test.txt
+
+# Environments
+.env

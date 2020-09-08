@@ -1,5 +1,5 @@
 # Server
-# Run 一個
+# Run
 ## Auth_Server
 IP：0.0.0.0
 

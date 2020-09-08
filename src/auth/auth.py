@@ -13,7 +13,8 @@ def login_handler():
     處裡登陸的事件
     """
     # 抓出 user
-    conn = psycopg2.connect(database="testdb", user="postgres", password="123456", host="127.0.0.1", port="5432")
+    DB_DATA = utils.getDB()
+    conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
     cur = conn.cursor()
     user_data = "SELECT * FROM users WHERE username = '%s'"%(request.form.get('username'))
     cur.execute(user_data)
@@ -58,7 +59,8 @@ def signup_handler():
     try:
         # 把密碼加密
         hashed_pwd = generate_password_hash(request.form.get('password'), method='sha256')
-        conn = psycopg2.connect(database="testdb", user="postgres", password="123456", host="127.0.0.1", port="5432")
+        DB_DATA = utils.getDB()
+        conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
         #使用 cursor() 方法建立一個遊標物件 cursor
         cur = conn.cursor()
         new_user = "INSERT INTO users (id, username, email, phone, password)\

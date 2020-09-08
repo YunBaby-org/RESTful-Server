@@ -5,7 +5,6 @@ from src.api.action import BrowserToRabbit
 from src import SECRET_KEY
 
 app = Flask(__name__)
-# app.config.from_object(config)
 app.config['SECRET_KEY'] = SECRET_KEY
 
     
@@ -71,4 +70,3 @@ def deltracker():
 
 if __name__=='__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
-    # app.run(port=5001, debug=True)
