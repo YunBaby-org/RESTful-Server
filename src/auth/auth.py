@@ -11,7 +11,7 @@ def login_handler():
     """
     # 抓出 user
     cur = utils.conn.cursor()
-    user_data = "SELECT * FROM users WHERE username = '%s'"%(request.form.get('username'))
+    user_data = "SELECT * FROM users WHERE email = '%s'"%(request.form.get('email'))
     cur.execute(user_data)
     user = cur.fetchone()
 
@@ -35,7 +35,7 @@ def login_handler():
         resp.set_cookie(key='refresh', value=token, expires=datetime.datetime.utcnow()+datetime.timedelta(weeks=4))
         return resp
     else:
-        return jsonify({'message': 'Username or Password Error!'}), 403
+        return jsonify({'message': 'Email or Password Error!'}), 403
 
 def logout_handler():
     """

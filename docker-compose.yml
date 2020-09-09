@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  auth_server:
+    build:
+      context: ./
+      dockerfile: DockerfileA
+    container_name: authserver
+    volumes:
+      - /home/logg_a:/app/log_auth
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+  
+  rest_server:
+    build:
+      context: ./
+      dockerfile: DockerfileR
+    container_name: restserver
+    volumes:
+      - /home/logg_r:/app/log_rest
+    ports:
+      - 5001:5001
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    container_name: postgres_0
+    volumes:
+      - /home/dbdata/pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - 5432:5432
