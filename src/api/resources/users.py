@@ -9,13 +9,11 @@ def getUserInfo():
     獲得個人資料
     """
     tokenData = utils.getTokenData()
-    DB_DATA = utils.getDB()
-    conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
-    cur = conn.cursor()
+    cur = utils.conn.cursor()
     user_data = "SELECT * FROM users WHERE id = '%s'"%(tokenData['userid'])
     cur.execute(user_data)
     user = cur.fetchone()
-    conn.close()
+
     return {'userid': user[0], 'username': user[1], 'email': user[2], 'phone': user[3]}
 
 def updateUserInfo():
@@ -26,14 +24,12 @@ def updateUserInfo():
     tokenData = utils.getTokenData()
 
     try:
-        DB_DATA = utils.getDB()
-        conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
-        cur = conn.cursor()
+        cur = utils.conn.cursor()
         hashed_pwd = generate_password_hash(request.form.get('password'), method='sha256')
         update_data = "UPDATE users set email='%s', phone='%s', password='%s' where id='%s'"%(request.form.get('email'), request.form.get('phone'), hashed_pwd, tokenData['userid'])
         cur.execute(update_data)
-        conn.commit()
-        conn.close()
+        utils.conn.commit()
+
         return jsonify({'message': 'Update finished'}), 200
     except Exception as e:
         return jsonify({'message': 'Failure'}), 403 
@@ -93,9 +89,7 @@ def getTrackers():
     /trackers [GET]
     """
     tokenData = utils.getTokenData()
-    DB_DATA = utils.getDB()
-    conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
-    cur = conn.cursor()
+    cur = utils.conn.cursor()
     tkr_data = "SELECT * FROM trackers WHERE user_id = '%s'"%(tokenData['userid'])
     cur.execute(tkr_data)
     tkrs = cur.fetchall()
@@ -112,14 +106,12 @@ def addTrackers():
     """
     tokenData = utils.getTokenData()
     try:
-        DB_DATA = utils.getDB()
-        conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
-        cur = conn.cursor()
+        cur = utils.conn.cursor()
         new_tkr = "INSERT INTO trackers (id, tkrname, phone, user_id)\
             VALUES('%s' ,'%s', '%s', '%s')"%(str(uuid.uuid1()), request.form.get('name'), request.form.get('phone'), tokenData['userid'])
         cur.execute(new_tkr)
-        conn.commit()
-        conn.close()
+        utils.conn.commit()
+
         return jsonify({'message': 'Add successful'}), 200
     except Exception as e:
         return jsonify({'message': 'Failure'}), 403 
@@ -129,13 +121,11 @@ def delTrackers():
     /deltracker [PUT]
     """
     try:
-        DB_DATA = utils.getDB()
-        conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
-        cur = conn.cursor()
+        cur = utils.conn.cursor()
         del_tkr = "DELETE FROM trackers WHERE id='%s'"%(request.json.get('id'))
         cur.execute(del_tkr)
-        conn.commit()
-        conn.close()
+        utils.conn.commit()
+
         return jsonify({'message': 'Del successful'}), 200
     except Exception as e:
         return jsonify({'message': 'Failure'}), 403 

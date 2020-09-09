@@ -1,10 +1,14 @@
 from flask import request
-import jwt, datetime
-from .. import JWT_SECRET_KEY
+import jwt, datetime, psycopg2, os
 import src.api.resources.users as User
-import psycopg2
-import os
 from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+conn = psycopg2.connect(database=os.getenv('DBDB'), user=os.getenv('DBUSER'), password=os.getenv('DBPASSWORD'), host=os.getenv('DBHOST'), port=os.getenv('DBPORT'))
 
 def getTokenData():
     """
@@ -17,13 +21,10 @@ def referToken():
     reftoken = request.cookies.get('refresh')
     reftokenData = jwt.decode(reftoken, JWT_SECRET_KEY)
 
-    DB_DATA = getDB()
-    conn = psycopg2.connect(database=DB_DATA['DBDB'], user=DB_DATA['DBUSER'], password=DB_DATA['DBPASSWORD'], host=DB_DATA['DBHOST'], port=DB_DATA['DBPORT'])
     cur = conn.cursor()
     user_data = "SELECT * FROM users WHERE id = '%s'"%(reftokenData['userid'])
     cur.execute(user_data)
     user = cur.fetchone()
-    conn.close()
 
     tokenPayload = {
         'userid': user[0],  
@@ -38,13 +39,3 @@ def getTkrData(tkr):
         'name': tkr[1],
         'phone': tkr[2] 
     }
-
-def getDB():
-    load_dotenv(find_dotenv())
-    DB_DATA = dict()
-    DB_DATA['DBDB'] = os.getenv('DBDB')
-    DB_DATA['DBUSER'] = os.getenv('DBUSER')
-    DB_DATA['DBPASSWORD'] = os.getenv('DBPASSWORD')
-    DB_DATA['DBHOST'] = os.getenv('DBHOST')
-    DB_DATA['DBPORT'] = os.getenv('DBPORT')
-    return DB_DATA

@@ -2,10 +2,10 @@ from flask import Flask, jsonify, request, make_response
 import src.api.resources.users as User
 from src.auth.auth import token_require
 from src.api.action import BrowserToRabbit
-from src import SECRET_KEY
+import src.utils.utils as utils
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SECRET_KEY'] = utils.SECRET_KEY
 
     
 # information

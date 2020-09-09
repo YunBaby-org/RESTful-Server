@@ -6,4 +6,4 @@ __pycache__
 db_test.txt
 
 # Environments
-.env
+# .env

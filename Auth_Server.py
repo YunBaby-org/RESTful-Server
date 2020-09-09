@@ -1,9 +1,9 @@
 from flask import Flask, request
 from src.auth.auth import login_handler, signup_handler, token_require, logout_handler
-from src import SECRET_KEY
+import src.utils.utils as utils
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SECRET_KEY'] = utils.SECRET_KEY
 
 # 登陸
 @app.route('/login', methods=['POST'])
