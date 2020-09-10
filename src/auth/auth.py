@@ -21,8 +21,6 @@ def login_handler():
             'userid': user[0], 
             'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         }
-        # 'username': user[1], 
-        # 'phone': user[2], 
         refreshPayload = {
             'userid': user[0], 
             'exp':datetime.datetime.utcnow()+datetime.timedelta(weeks=4)
@@ -75,25 +73,15 @@ def token_require(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.cookies.get('JWT_TOKEN')
-        reftoken = request.cookies.get('refresh')
         # 沒有 token
-        if not token and not reftoken:
+        if not token:
             # 401 or 403
-            return jsonify({'message': 'Token is missing, you need login'}), 403
+            return jsonify({'message': 'Token is missing , you need login or refre'}), 403
         
         # 判斷 token 是否正確
         try:
             jwt.decode(token, utils.JWT_SECRET_KEY)
         except:
-            try:
-                jwt.decode(reftoken, utils.JWT_SECRET_KEY)
-                resp = make_response(jsonify({'message': 'New token has been sent, please retransmit'}), 200)
-                # 拿新的 tkn
-                refertoken = utils.referToken()
-                print(refertoken)
-                resp.set_cookie(key='JWT_TOKEN', value=refertoken, expires=datetime.datetime.utcnow()+datetime.timedelta(minutes=30))
-                return resp
-            except:
-                return jsonify({'message': 'Token is missing or invalid'}), 403
+            return jsonify({'message': 'Token is missing or invalid'}), 403
         return f(*args, **kwargs)
     return decorated

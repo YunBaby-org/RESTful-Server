@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, make_response, jsonify
 import jwt, datetime, psycopg2, os
 import src.api.resources.users as User
 from dotenv import load_dotenv, find_dotenv
@@ -17,20 +17,21 @@ def getTokenData():
     token = request.cookies.get('JWT_TOKEN')
     return jwt.decode(token, JWT_SECRET_KEY)    # dict
 
-def referToken():
+def refreToken():
+    """
+    update  access token
+    """
     reftoken = request.cookies.get('refresh')
     reftokenData = jwt.decode(reftoken, JWT_SECRET_KEY)
 
-    cur = conn.cursor()
-    user_data = "SELECT * FROM users WHERE id = '%s'"%(reftokenData['userid'])
-    cur.execute(user_data)
-    user = cur.fetchone()
-
+    resp = make_response(jsonify({'message': 'New token has been sent'}), 200)
     tokenPayload = {
-        'userid': user[0],  
+        'userid': reftokenData['userid'],  
         'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
     }
-    return jwt.encode(payload=tokenPayload, key=JWT_SECRET_KEY)
+    newAccessToken = jwt.encode(payload=tokenPayload, key=JWT_SECRET_KEY)
+    resp.set_cookie(key='JWT_TOKEN', value=newAccessToken, expires=datetime.datetime.utcnow()+datetime.timedelta(minutes=30))
+    return resp
 
 
 def getTkrData(tkr):
