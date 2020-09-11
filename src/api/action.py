@@ -17,18 +17,14 @@ def BrowserToRabbit():
     """
     request_data = request.json.get('Request')
     payload_data = request.json.get('Payload')
-    tkrname_data = request.json.get('tracker_name')
+    tkr_id = request.json.get('tracker_id')
 
     # 查看是否有這個指令
     if (request_data not in request_dict['Request']):
-        return jsonify({'message': 'Missing parameters'}), 400
+        return jsonify({'message': 'Request parameters error'}), 400
 
     try:
-        cur = utils.conn.cursor()
-        tkr_data = "SELECT * FROM trackers WHERE tkrname = '%s'"%(tkrname_data)
-        cur.execute(tkr_data)
-        tkrname = cur.fetchone()
-        queue_name = "tracker." + tkrname[0] + ".requests"
+        queue_name = "tracker." + tkr_id + ".requests"
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.getenv('RABBITHOST'), port=os.getenv('RABBITPORT')))
         channel = connection.channel()
         channel.queue_declare(queue=queue_name)

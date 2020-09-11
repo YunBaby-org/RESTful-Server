@@ -1,5 +1,5 @@
-from flask import Flask, request
-from src.auth.auth import login_handler, signup_handler, token_require, logout_handler
+from flask import Flask, request, jsonify
+from src.auth.auth import login_handler, signup_handler, token_require, logout_handler, refreToken
 import src.utils.utils as utils
 
 app = Flask(__name__)
@@ -26,7 +26,12 @@ def signup():
     
 @app.route('/refreshToken', methods=['POST'])
 def refreshToken():
-    return utils.refreToken()
+    return refreToken()
+
+@app.route('/me')
+@token_require
+def me():
+    return jsonify({'status': 'ok'})
 
 @app.route('/')
 def index():

@@ -29,5 +29,7 @@ $ python RESTful_Server.py
 - DBPORT
 
 ## RabbitMQ
+> 如果有需要其他的說一下
+
 - RABBITHOST 
 - RABBITPORT

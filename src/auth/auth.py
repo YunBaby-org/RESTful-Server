@@ -7,7 +7,7 @@ import src.utils.utils as utils
 
 def login_handler():
     """
-    處裡登陸的事件
+    login handler
     """
     # 抓出 user
     cur = utils.conn.cursor()
@@ -37,7 +37,7 @@ def login_handler():
 
 def logout_handler():
     """
-    處裡登出的事件
+    logout handler
     """
     resp = make_response(jsonify({'message': 'Logout Successful'}), 200)
     # 刪除 cookies
@@ -47,7 +47,7 @@ def logout_handler():
        
 def signup_handler():
     """
-    處裡註冊的事件
+    signup handler
     """
     try:
         # 把密碼加密
@@ -63,8 +63,24 @@ def signup_handler():
         utils.conn.commit()
 
         return jsonify({'message': 'Sign up successful'}), 200
-    except Exception as e:
+    except:
         return jsonify({'message': 'Failure'}), 403
+
+def refreToken():
+    """
+    update access token
+    """
+    reftoken = request.cookies.get('refresh')
+    reftokenData = jwt.decode(reftoken, utils.JWT_SECRET_KEY)
+
+    resp = make_response(jsonify({'message': 'New token has been sent'}), 200)
+    tokenPayload = {
+        'userid': reftokenData['userid'],  
+        'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
+    }
+    newAccessToken = jwt.encode(payload=tokenPayload, key=utils.JWT_SECRET_KEY)
+    resp.set_cookie(key='JWT_TOKEN', value=newAccessToken, expires=datetime.datetime.utcnow()+datetime.timedelta(minutes=30))
+    return resp
 
 def token_require(f):
     """
