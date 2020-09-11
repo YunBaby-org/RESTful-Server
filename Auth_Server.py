@@ -24,6 +24,9 @@ def signup():
     if request.method=='POST':
         return signup_handler()
     
+@app.route('/refreshToken', methods=['POST'])
+def refreshToken():
+    return utils.refreToken()
 
 @app.route('/')
 def index():

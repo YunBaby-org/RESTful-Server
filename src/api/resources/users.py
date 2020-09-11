@@ -29,9 +29,9 @@ def updateUserInfo():
         update_data = "UPDATE users set email='%s', phone='%s', password='%s' where id='%s'"%(request.form.get('email'), request.form.get('phone'), hashed_pwd, tokenData['userid'])
         cur.execute(update_data)
         utils.conn.commit()
-
         return jsonify({'message': 'Update finished'}), 200
     except Exception as e:
+        print(e)
         return jsonify({'message': 'Failure'}), 403 
 
 def getLocInfo():
@@ -89,6 +89,7 @@ def getTrackers():
     /trackers [GET]
     """
     tokenData = utils.getTokenData()
+    
     cur = utils.conn.cursor()
     tkr_data = "SELECT * FROM trackers WHERE user_id = '%s'"%(tokenData['userid'])
     cur.execute(tkr_data)
@@ -111,7 +112,6 @@ def addTrackers():
             VALUES('%s' ,'%s', '%s', '%s')"%(str(uuid.uuid1()), request.form.get('name'), request.form.get('phone'), tokenData['userid'])
         cur.execute(new_tkr)
         utils.conn.commit()
-
         return jsonify({'message': 'Add successful'}), 200
     except Exception as e:
         return jsonify({'message': 'Failure'}), 403 
@@ -125,7 +125,6 @@ def delTrackers():
         del_tkr = "DELETE FROM trackers WHERE id='%s'"%(request.json.get('id'))
         cur.execute(del_tkr)
         utils.conn.commit()
-
         return jsonify({'message': 'Del successful'}), 200
     except Exception as e:
         return jsonify({'message': 'Failure'}), 403 

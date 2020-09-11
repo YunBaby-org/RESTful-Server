@@ -16,11 +16,18 @@ Port：```5001```
 $ python RESTful_Server.py
 ```
 
-# PostgreSQL
-user：```postgres```
+# 環境變數
+## Server
+- JWT_SECRET_KEY 
+- SECRET_KEY
 
-password：```123456```
+## DB
+- DBDB 
+- DBUSER 
+- DBPASSWORD
+- DBHOST
+- DBPORT
 
-host：```db```
-
-port：```5432```
+## RabbitMQ
+- RABBITHOST 
+- RABBITPORT
