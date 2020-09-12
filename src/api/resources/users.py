@@ -68,7 +68,7 @@ def addBoundary():
     tkr_id = request.json.get('tkr_id')
     cur = utils.conn.cursor()
     add_bnd = "INSERT INTO boundary (id, tracker_id, time_start, time_end, weekday_start, weekday_end, lat, lng, radius)\
-        VALUES('%s','%s', %d, %d, %d, %d, %f, %f, %d)"%(str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'])
+        VALUES('%s','%s', '%s', '%s' , %d, %d, %f, %f, %d)"%(str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'])
     print((str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius']))
     cur.execute(add_bnd)
     utils.conn.commit()
@@ -80,26 +80,34 @@ def getBoundary():
     """
     bnd_mode = int(request.args.get('mode'))
     tkr_id = request.args.get('tracker')
+    weekday = datetime.datetime.now().isoweekday()
+    current_time = datetime.datetime.now().strftime("%H:%M:%S")
     cur = utils.conn.cursor()
-    bnd_data = "SELECT * FROM boundary WHERE tracker_id = '%s'"%(tkr_id)
-    cur.execute(bnd_data)
-    bnds = cur.fetchall()
-    if bnds==None:
-        return jsonify({"message": "No boundary"}), 404
+    print(type(current_time))
+    result = list()
+    
     if bnd_mode==0:
-        result = list()
-        for bnd in bnds:
-            result.append(utils.getBndData(bnd))
-        return jsonify({"boundarys": result}), 200
+        bnd_data = "SELECT * FROM boundary WHERE tracker_id = '%s'"%(tkr_id)
+        cur.execute(bnd_data)
+        bnds = cur.fetchall()
+        if bnds:
+            for bnd in bnds:
+                result.append(utils.getBndData(bnd))
+            return jsonify({"boundarys": result}), 200
+        else:
+            return jsonify({"message": "No boundary"}), 404
     elif bnd_mode==1:
-        result = ''
-        for bnd in bnds:
-            result = utils.getBndTimeData(bnd)
-            if result != '':
-                break
-        if result=='':
-            return jsonify({"boundary": "No match boundary"}), 404
-        return jsonify({"boundary": result}), 200
+        bnd_data = "SELECT * FROM boundary WHERE tracker_id = '%s' and %d>=weekday_start and %d<=weekday_end and time'%s'>=time_start and time '%s'<=time_end"\
+            %(tkr_id, weekday, weekday, current_time, current_time)
+        cur.execute(bnd_data)
+        bnds = cur.fetchall()
+        print(bnds)
+        if bnds:
+            for bnd in bnds:
+                result.append(utils.getBndData(bnd))
+            return jsonify({"boundarys": result}), 200
+        else:
+            return jsonify({"message": "No boundary"}), 404
     else:
         return jsonify({"message": "Mode error"}), 404
 
@@ -110,7 +118,7 @@ def updateBoundary():
     bnd_data = request.json.get('boundary')
     bnd_id = request.json.get('bnd_id')
     cur = utils.conn.cursor()
-    update_data = "UPDATE boundary set time_start=%d, time_end=%d, weekday_start=%d, weekday_end=%d, lat=%f, lng=%f, radius=%d where id='%s'"%(bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'], bnd_id)
+    update_data = "UPDATE boundary set time_start='%s', time_end='%s', weekday_start=%d, weekday_end=%d, lat=%f, lng=%f, radius=%d where id='%s'"%(bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'], bnd_id)
     cur.execute(update_data)
     utils.conn.commit()
     return jsonify({'message': 'Successful'}), 201

@@ -45,26 +45,11 @@ def getTkrData(tkr):
 def getBndData(bnd):
     return {
         'id': bnd[0],
-        'time_start': bnd[2],
-        'time_end': bnd[3],
+        'time_start': str(bnd[2]),
+        'time_end': str(bnd[3]),
         'weekday_start': bnd[4],
         'weekday_end': bnd[5],
         'lat': bnd[6],
         'lng': bnd[7],
         'radius': bnd[8]
     }
-
-def getBndTimeData(bnd):
-    if bnd[4]<=datetime.datetime.now().isoweekday() and bnd[5]>=datetime.datetime.now().isoweekday():
-        if bnd[2]<=datetime.datetime.now().hour and bnd[3]>=datetime.datetime.now().hour:
-            return {
-                'id': bnd[0],
-                'time_start': bnd[2],
-                'time_end': bnd[3],
-                'weekday_start': bnd[4],
-                'weekday_end': bnd[5],
-                'lat': bnd[6],
-                'lng': bnd[7],
-                'radius': bnd[8]
-            }
-    return ''
