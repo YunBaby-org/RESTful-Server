@@ -145,11 +145,12 @@ def addTrackers():
     tokenData = utils.getTokenData()
     try:
         cur = utils.conn.cursor()
+        tkr_id = str(uuid.uuid1())
         new_tkr = "INSERT INTO trackers (id, tkrname, phone, user_id)\
-            VALUES('%s' ,'%s', '%s', '%s')"%(str(uuid.uuid1()), request.form.get('name'), request.form.get('phone'), tokenData['userid'])
+            VALUES('%s' ,'%s', '%s', '%s')"%(tkr_id, request.form.get('name'), request.form.get('phone'), tokenData['userid'])
         cur.execute(new_tkr)
         utils.conn.commit()
-        return jsonify({'message': 'Add successful'}), 201
+        return jsonify({'tracker_id': tkr_id}), 201
     except:
         return jsonify({'message': 'Failure'}), 403 
 
