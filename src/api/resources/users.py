@@ -90,7 +90,7 @@ def getBoundary():
         result = list()
         for bnd in bnds:
             result.append(utils.getBndData(bnd))
-        return jsonify({"boundary": result}), 200
+        return jsonify({"boundarys": result}), 200
     elif bnd_mode==1:
         result = ''
         for bnd in bnds:
