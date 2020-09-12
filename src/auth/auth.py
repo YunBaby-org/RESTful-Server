@@ -91,13 +91,12 @@ def token_require(f):
         token = request.cookies.get('JWT_TOKEN')
         # 沒有 token
         if not token:
-            # 401 or 403
-            return jsonify({'message': 'Token is missing , you need login or refre'}), 403
+            return jsonify({'message': 'Token is missing , you need login or refre'}), 401
         
         # 判斷 token 是否正確
         try:
             jwt.decode(token, utils.JWT_SECRET_KEY)
         except:
-            return jsonify({'message': 'Token is missing or invalid'}), 403
+            return jsonify({'message': 'Token is missing or invalid'}), 401
         return f(*args, **kwargs)
     return decorated

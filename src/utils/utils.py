@@ -2,6 +2,7 @@ from flask import request, make_response, jsonify
 import jwt, datetime, psycopg2, os
 import src.api.resources.users as User
 from dotenv import load_dotenv, find_dotenv
+import datetime
 
 load_dotenv(find_dotenv())
 
@@ -40,3 +41,30 @@ def getTkrData(tkr):
         'name': tkr[1],
         'phone': tkr[2] 
     }
+
+def getBndData(bnd):
+    return {
+        'id': bnd[0],
+        'time_start': bnd[2],
+        'time_end': bnd[3],
+        'weekday_start': bnd[4],
+        'weekday_end': bnd[5],
+        'lat': bnd[6],
+        'lng': bnd[7],
+        'radius': bnd[8]
+    }
+
+def getBndTimeData(bnd):
+    if bnd[4]<=datetime.datetime.now().isoweekday() and bnd[5]>=datetime.datetime.now().isoweekday():
+        if bnd[2]<=datetime.datetime.now().hour and bnd[3]>=datetime.datetime.now().hour:
+            return {
+                'id': bnd[0],
+                'time_start': bnd[2],
+                'time_end': bnd[3],
+                'weekday_start': bnd[4],
+                'weekday_end': bnd[5],
+                'lat': bnd[6],
+                'lng': bnd[7],
+                'radius': bnd[8]
+            }
+    return ''

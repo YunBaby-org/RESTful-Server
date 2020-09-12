@@ -35,13 +35,15 @@ def send_request():
     return BrowserToRabbit()
 
 # boundary
-@app.route('/api/v1/resources/users/boundary', methods=['GET', 'PUT'])
+@app.route('/api/v1/resources/users/boundary', methods=['GET', 'PUT', 'POST'])
 @token_require
 def boundary():
     if request.method=='GET':
         return User.getBoundary()
+    elif request.method=='POST':
+        return User.addBoundary()
     elif request.method=='PUT':
-        pass
+        return User.updateBoundary()
 
 # responses
 @app.route('/api/v1/resources/users/responses', methods=['GET'])

@@ -1,6 +1,6 @@
 import src.utils.utils as utils
 from flask import jsonify, Flask, request
-import psycopg2, uuid
+import psycopg2, uuid, datetime
 from werkzeug.security import generate_password_hash
 
 def getUserInfo():
@@ -60,23 +60,60 @@ def getLocInfo():
         }
     }), 200
 
-def putBoundary():
+def addBoundary():
     """
-    /boundary [PUT]
+    /boundary [POST]
     """
-    pass
+    bnd_data = request.json.get('boundary')
+    tkr_id = request.json.get('tkr_id')
+    cur = utils.conn.cursor()
+    add_bnd = "INSERT INTO boundary (id, tracker_id, time_start, time_end, weekday_start, weekday_end, lat, lng, radius)\
+        VALUES('%s','%s', %d, %d, %d, %d, %f, %f, %d)"%(str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'])
+    print((str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius']))
+    cur.execute(add_bnd)
+    utils.conn.commit()
+    return jsonify({'message': 'Successful'}), 201
 
 def getBoundary():
     """
     /boundary [GET]
     """
-    tracker_id = request.args.get('tracker')
-    boundary = {"boundary":{
-        "lat":123,
-        "lng":456,
-        "radius":30
-    }}
-    return jsonify(boundary), 200
+    bnd_mode = int(request.args.get('mode'))
+    tkr_id = request.args.get('tracker')
+    cur = utils.conn.cursor()
+    bnd_data = "SELECT * FROM boundary WHERE tracker_id = '%s'"%(tkr_id)
+    cur.execute(bnd_data)
+    bnds = cur.fetchall()
+    if bnds==None:
+        return jsonify({"message": "No boundary"}), 404
+    if bnd_mode==0:
+        result = list()
+        for bnd in bnds:
+            result.append(utils.getBndData(bnd))
+        return jsonify({"boundary": result}), 200
+    elif bnd_mode==1:
+        result = ''
+        for bnd in bnds:
+            result = utils.getBndTimeData(bnd)
+            if result != '':
+                break
+        if result=='':
+            return jsonify({"boundary": "No match boundary"}), 404
+        return jsonify({"boundary": result}), 200
+    else:
+        return jsonify({"message": "Mode error"}), 404
+
+def updateBoundary():
+    """
+    /boundary [PUT]
+    """
+    bnd_data = request.json.get('boundary')
+    bnd_id = request.json.get('bnd_id')
+    cur = utils.conn.cursor()
+    update_data = "UPDATE boundary set time_start=%d, time_end=%d, weekday_start=%d, weekday_end=%d, lat=%f, lng=%f, radius=%d where id='%s'"%(bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'], bnd_id)
+    cur.execute(update_data)
+    utils.conn.commit()
+    return jsonify({'message': 'Successful'}), 201
 
 def getResponses():
     """
@@ -112,8 +149,8 @@ def addTrackers():
             VALUES('%s' ,'%s', '%s', '%s')"%(str(uuid.uuid1()), request.form.get('name'), request.form.get('phone'), tokenData['userid'])
         cur.execute(new_tkr)
         utils.conn.commit()
-        return jsonify({'message': 'Add successful'}), 200
-    except Exception as e:
+        return jsonify({'message': 'Add successful'}), 201
+    except:
         return jsonify({'message': 'Failure'}), 403 
 
 def delTrackers():
@@ -126,5 +163,5 @@ def delTrackers():
         cur.execute(del_tkr)
         utils.conn.commit()
         return jsonify({'message': 'Del successful'}), 200
-    except Exception as e:
+    except:
         return jsonify({'message': 'Failure'}), 403 
