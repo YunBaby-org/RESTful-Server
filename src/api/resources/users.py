@@ -64,15 +64,21 @@ def addBoundary():
     """
     /boundary [POST]
     """
-    bnd_data = request.json.get('boundary')
-    tkr_id = request.json.get('tkr_id')
-    cur = utils.conn.cursor()
-    add_bnd = "INSERT INTO boundary (id, tracker_id, time_start, time_end, weekday_start, weekday_end, lat, lng, radius)\
-        VALUES('%s','%s', '%s', '%s' , %d, %d, %f, %f, %d)"%(str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'])
-    print((str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius']))
-    cur.execute(add_bnd)
-    utils.conn.commit()
-    return jsonify({'message': 'Successful'}), 201
+    try:
+        bnd_data = request.json.get('boundary')
+        tkr_id = request.json.get('tkr_id')
+        cur = utils.conn.cursor()
+        add_bnd = "INSERT INTO boundary (id, tracker_id, time_start, time_end, weekday_start, weekday_end, lat, lng, radius)\
+            VALUES('%s','%s', '%s', '%s' , %d, %d, %f, %f, %d)"%(str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'])
+        print('--- 1 ---')
+        print((str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius']))
+        cur.execute(add_bnd)
+        print('--- 2 ---')
+        utils.conn.commit()
+        return jsonify({'message': 'Successful'}), 201
+    except:
+        return jsonify({'message': 'Failure'}), 403 
+        
 
 def getBoundary():
     """
@@ -140,11 +146,12 @@ def getTrackers():
     cur.execute(tkr_data)
     tkrs = cur.fetchall()
     tkr_datas = dict()
-    for tkr in tkrs:
-        tkr_datas[tkr[0]] = (utils.getTkrData(tkr))
-    return jsonify({
-        "trackers": tkr_datas
-    }), 200
+    if tkrs:
+        for tkr in tkrs:
+            tkr_datas[tkr[0]] = (utils.getTkrData(tkr))
+        return jsonify({"trackers": tkr_datas}), 200
+    else:
+        return jsonify({"message": "No boundary"}), 404
 
 def addTrackers():
     """
