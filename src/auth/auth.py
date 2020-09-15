@@ -1,6 +1,6 @@
 from flask import request, make_response, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-import jwt, datetime, psycopg2, uuid
+import jwt, datetime, psycopg2, uuid, pytz
 from functools import wraps
 import src.api.resources.users as User
 import src.utils.utils as utils
@@ -10,6 +10,7 @@ def login_handler():
     login handler
     """
     # 抓出 user
+    tw = pytz.timezone('Asia/Taipei')
     cur = utils.conn.cursor()
     user_data = "SELECT * FROM users WHERE email = '%s'"%(request.form.get('email'))
     cur.execute(user_data)
@@ -19,18 +20,18 @@ def login_handler():
         # exp time 30m
         tokenPayload = {
             'userid': user[0], 
-            'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
+            'exp':datetime.datetime.now(tw)+datetime.timedelta(minutes=30)
         }
         refreshPayload = {
             'userid': user[0], 
-            'exp':datetime.datetime.utcnow()+datetime.timedelta(weeks=4)
+            'exp':datetime.datetime.now(tw)+datetime.timedelta(weeks=4)
         }
         resp = make_response(jsonify({'message': 'Login Successful'}), 200)
         # 傳送 設定 cookies time
         token = jwt.encode(payload=tokenPayload, key=utils.JWT_SECRET_KEY)
-        resp.set_cookie(key='JWT_TOKEN', value=token, expires=datetime.datetime.utcnow()+datetime.timedelta(minutes=30))
+        resp.set_cookie(key='JWT_TOKEN', value=token, expires=datetime.datetime.now(tw)+datetime.timedelta(minutes=30))
         token = jwt.encode(payload=refreshPayload, key=utils.JWT_SECRET_KEY)
-        resp.set_cookie(key='refresh', value=token, expires=datetime.datetime.utcnow()+datetime.timedelta(weeks=4))
+        resp.set_cookie(key='refresh', value=token, expires=datetime.datetime.now(tw)+datetime.timedelta(weeks=4))
         return resp
     else:
         return jsonify({'message': 'Email or Password Error!'}), 403
@@ -72,14 +73,15 @@ def refreToken():
     """
     reftoken = request.cookies.get('refresh')
     reftokenData = jwt.decode(reftoken, utils.JWT_SECRET_KEY)
+    tw = pytz.timezone('Asia/Taipei')
 
     resp = make_response(jsonify({'message': 'New token has been sent'}), 200)
     tokenPayload = {
         'userid': reftokenData['userid'],  
-        'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
+        'exp':datetime.datetime.now(tw)+datetime.timedelta(minutes=30)
     }
     newAccessToken = jwt.encode(payload=tokenPayload, key=utils.JWT_SECRET_KEY)
-    resp.set_cookie(key='JWT_TOKEN', value=newAccessToken, expires=datetime.datetime.utcnow()+datetime.timedelta(minutes=30))
+    resp.set_cookie(key='JWT_TOKEN', value=newAccessToken, expires=datetime.datetime.now(tw)+datetime.timedelta(minutes=30))
     return resp
 
 def token_require(f):

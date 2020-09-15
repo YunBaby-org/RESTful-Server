@@ -1,6 +1,6 @@
 import src.utils.utils as utils
 from flask import jsonify, Flask, request
-import psycopg2, uuid, datetime
+import psycopg2, uuid, datetime, pytz
 from werkzeug.security import generate_password_hash
 
 def getUserInfo():
@@ -86,8 +86,9 @@ def getBoundary():
     """
     bnd_mode = int(request.args.get('mode'))
     tkr_id = request.args.get('tracker')
-    weekday = datetime.datetime.now().isoweekday()
-    current_time = datetime.datetime.now().strftime("%H:%M:%S")
+    tw = pytz.timezone('Asia/Taipei') # 建立一個時區物件
+    weekday = datetime.datetime.now(tw).isoweekday()
+    current_time = datetime.datetime.now(tw).strftime("%H:%M:%S")
     cur = utils.conn.cursor()
     print(type(current_time))
     result = list()
