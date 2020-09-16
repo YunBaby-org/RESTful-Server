@@ -68,16 +68,13 @@ def addBoundary():
         bnd_data = request.json.get('boundary')
         tkr_id = request.json.get('tkr_id')
         cur = utils.conn.cursor()
-        add_bnd = "INSERT INTO boundary (id, tracker_id, time_start, time_end, weekday_start, weekday_end, lat, lng, radius)\
-            VALUES('%s','%s', '%s', '%s' , %d, %d, %f, %f, %d)"%(str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'])
-        print('--- 1 ---')
-        print((str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius']))
+        add_bnd = "INSERT INTO boundary (id, tracker_id, time_start, time_end, lat, lng, radius)\
+            VALUES('%s','%s', '%s', '%s', %f, %f, %d)"%(str(uuid.uuid1()), tkr_id, bnd_data['time_start'], bnd_data['time_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'])
         cur.execute(add_bnd)
-        print('--- 2 ---')
         utils.conn.commit()
         return jsonify({'message': 'Successful'}), 201
     except:
-        return jsonify({'message': 'Failure'}), 403 
+        return jsonify({'message': 'Failure'}), 400
         
 
 def getBoundary():
@@ -87,12 +84,10 @@ def getBoundary():
     bnd_mode = int(request.args.get('mode'))
     tkr_id = request.args.get('tracker')
     tw = pytz.timezone('Asia/Taipei') # 建立一個時區物件
-    weekday = datetime.datetime.now(tw).isoweekday()
-    current_time = datetime.datetime.now(tw).strftime("%H:%M:%S")
+    current_time = datetime.datetime.now(tw).strftime("%Y-%m-%d %H:%M:%S%z")
     cur = utils.conn.cursor()
     print(type(current_time))
     result = list()
-    
     if bnd_mode==0:
         bnd_data = "SELECT * FROM boundary WHERE tracker_id = '%s'"%(tkr_id)
         cur.execute(bnd_data)
@@ -102,10 +97,10 @@ def getBoundary():
                 result.append(utils.getBndData(bnd))
             return jsonify({"boundarys": result}), 200
         else:
-            return jsonify({"message": "No boundary"}), 404
+            return jsonify({"message": "No boundary"}), 200
     elif bnd_mode==1:
-        bnd_data = "SELECT * FROM boundary WHERE tracker_id = '%s' and %d>=weekday_start and %d<=weekday_end and time'%s'>=time_start and time '%s'<=time_end"\
-            %(tkr_id, weekday, weekday, current_time, current_time)
+        bnd_data = "SELECT * FROM boundary WHERE tracker_id = '%s' and timestamptz'%s'>=time_start and timestamptz'%s'<=time_end"\
+            %(tkr_id, current_time, current_time)
         cur.execute(bnd_data)
         bnds = cur.fetchall()
         print(bnds)
@@ -114,9 +109,9 @@ def getBoundary():
                 result.append(utils.getBndData(bnd))
             return jsonify({"boundarys": result}), 200
         else:
-            return jsonify({"message": "No boundary"}), 404
+            return jsonify({"message": "No boundary"}), 200
     else:
-        return jsonify({"message": "Mode error"}), 404
+        return jsonify({"message": "Mode error"}), 400
 
 def updateBoundary():
     """
@@ -125,10 +120,23 @@ def updateBoundary():
     bnd_data = request.json.get('boundary')
     bnd_id = request.json.get('bnd_id')
     cur = utils.conn.cursor()
-    update_data = "UPDATE boundary set time_start='%s', time_end='%s', weekday_start=%d, weekday_end=%d, lat=%f, lng=%f, radius=%d where id='%s'"%(bnd_data['time_start'], bnd_data['time_end'], bnd_data['weekday_start'], bnd_data['weekday_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'], bnd_id)
+    update_data = "UPDATE boundary set time_start='%s', time_end='%s', lat=%f, lng=%f, radius=%d where id='%s'"%(bnd_data['time_start'], bnd_data['time_end'], bnd_data['lat'], bnd_data['lng'], bnd_data['radius'], bnd_id)
     cur.execute(update_data)
     utils.conn.commit()
     return jsonify({'message': 'Successful'}), 201
+
+def delBoundary():
+    """
+    /delBoundary [DELETE]
+    """
+    try:
+        cur = utils.conn.cursor()
+        del_tkr = "DELETE FROM boundary WHERE id='%s'"%(request.json.get('id'))
+        cur.execute(del_tkr)
+        utils.conn.commit()
+        return jsonify({'message': 'Del successful'}), 200
+    except:
+        return jsonify({'message': 'Failure'}), 400
 
 def getResponses():
     """
@@ -152,7 +160,7 @@ def getTrackers():
             tkr_datas[tkr[0]] = (utils.getTkrData(tkr))
         return jsonify({"trackers": tkr_datas}), 200
     else:
-        return jsonify({"message": "No boundary"}), 404
+        return jsonify({"message": "No boundary"}), 200
 
 def addTrackers():
     """
@@ -168,11 +176,11 @@ def addTrackers():
         utils.conn.commit()
         return jsonify({'tracker_id': tkr_id}), 201
     except:
-        return jsonify({'message': 'Failure'}), 403 
+        return jsonify({'message': 'Failure'}), 400
 
 def delTrackers():
     """
-    /deltracker [PUT]
+    /deltracker [DELETE]
     """
     try:
         cur = utils.conn.cursor()
@@ -181,4 +189,4 @@ def delTrackers():
         utils.conn.commit()
         return jsonify({'message': 'Del successful'}), 200
     except:
-        return jsonify({'message': 'Failure'}), 403 
+        return jsonify({'message': 'Failure'}), 400

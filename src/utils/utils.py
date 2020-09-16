@@ -29,9 +29,7 @@ def getBndData(bnd):
         'id': bnd[0],
         'time_start': str(bnd[2]),
         'time_end': str(bnd[3]),
-        'weekday_start': bnd[4],
-        'weekday_end': bnd[5],
-        'lat': bnd[6],
-        'lng': bnd[7],
-        'radius': bnd[8]
+        'lat': bnd[4],
+        'lng': bnd[5],
+        'radius': bnd[6]
     }

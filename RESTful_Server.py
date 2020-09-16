@@ -31,7 +31,7 @@ def send_request():
     return BrowserToRabbit()
 
 # boundary
-@app.route('/api/v1/resources/users/boundary', methods=['GET', 'PUT', 'POST'])
+@app.route('/api/v1/resources/users/boundary', methods=['GET', 'PUT', 'POST', 'DELETE'])
 @token_require
 def boundary():
     if request.method=='GET':
@@ -40,6 +40,8 @@ def boundary():
         return User.addBoundary()
     elif request.method=='PUT':
         return User.updateBoundary()
+    elif request.method=='DELETE':
+        return User.delBoundary()
 
 # responses
 @app.route('/api/v1/resources/users/responses', methods=['GET'])
@@ -61,7 +63,7 @@ def addtracker():
     return User.addTrackers()
 
 # deltracker
-@app.route('/api/v1/resources/users/deltracker', methods=['PUT'])
+@app.route('/api/v1/resources/users/deltracker', methods=['DELETE'])
 @token_require
 def deltracker():
     return User.delTrackers()
