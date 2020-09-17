@@ -50,23 +50,15 @@ def responses():
     pass
 
 # trackers
-@app.route('/api/v1/resources/users/trackers', methods=['GET'])
+@app.route('/api/v1/resources/users/trackers', methods=['GET', 'POST', 'DELETE' ])
 @token_require
 def trackers():
-    return User.getTrackers()
-
-
-# addtracker
-@app.route('/api/v1/resources/users/addtracker', methods=['POST'])
-@token_require
-def addtracker():
-    return User.addTrackers()
-
-# deltracker
-@app.route('/api/v1/resources/users/deltracker', methods=['DELETE'])
-@token_require
-def deltracker():
-    return User.delTrackers()
+    if request.method=='GET':
+        return User.getTrackers()
+    elif request.method=='POST':
+        return User.addTrackers()
+    elif request.method=='DELETE':
+        return User.delTrackers()
 
 if __name__=='__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
