@@ -160,7 +160,7 @@ def getTrackers():
             tkr_datas[tkr[0]] = (utils.getTkrData(tkr))
         return jsonify({"trackers": tkr_datas}), 200
     else:
-        return jsonify({"message": "No boundary"}), 200
+        return jsonify({"message": tkr_datas}), 200
 
 def addTrackers():
     """
